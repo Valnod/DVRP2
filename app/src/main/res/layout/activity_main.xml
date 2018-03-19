@@ -4,8 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.alex.spp.MainActivity"
-    tools:layout_editor_absoluteY="25dp">
+    tools:context="com.example.alex.spp.MainActivity">
 
     <SurfaceView
         android:id="@+id/surfaceView"
@@ -43,7 +42,7 @@
         android:id="@+id/buttonPicture"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="46dp"
+        android:layout_marginEnd="47dp"
         android:layout_marginTop="45dp"
         android:onClick="onClickPicture"
         android:text="Take Pcture"
