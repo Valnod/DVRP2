@@ -1,4 +1,4 @@
-package com.example.dvrp;
+package com.example.alex.spp;
 
 import org.junit.Test;
 

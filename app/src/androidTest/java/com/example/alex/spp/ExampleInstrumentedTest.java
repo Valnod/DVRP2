@@ -1,4 +1,4 @@
-package com.example.dvrp;
+package com.example.alex.spp;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
@@ -21,6 +21,6 @@ public class ExampleInstrumentedTest {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getTargetContext();
 
-        assertEquals("com.example.dvrp", appContext.getPackageName());
+        assertEquals("com.example.alex.spp", appContext.getPackageName());
     }
 }
