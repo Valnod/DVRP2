@@ -11,9 +11,12 @@ import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
+import android.widget.ImageView;
+import android.widget.Toast;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -25,18 +28,21 @@ public class MainActivity extends AppCompatActivity {
     SurfaceView surfaceView;
     Camera camera;
     MediaRecorder mediaRecorder;
-
-    //File videoFile;
-    //File photoFile;
+    ImageView recordImageView;
+    boolean isRecording;
 
     public static final int MEDIA_TYPE_IMAGE = 1;
     public static final int MEDIA_TYPE_VIDEO = 2;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         surfaceView = findViewById(R.id.surfaceView);
+        recordImageView = findViewById(R.id.imageViewRecord);
+
+        isRecording = false;
 
         //File pictures = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
         //photoFile = new File(pictures, "myPhoto.jpg");
@@ -82,10 +88,23 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onClickPicture(View view) {
+        if(isRecording){
+            if (mediaRecorder != null) {
+                mediaRecorder.stop();
+                releaseMediaRecorder();
+            }
+            camera.lock();
+            isRecording = false;
+            recordImageView.setImageResource(R.drawable.record);
+            Toast toast = Toast.makeText(this, "II", Toast.LENGTH_SHORT);
+            toast.setGravity(Gravity.CENTER, 0, 0);
+            toast.show();
+        }
         camera.takePicture(null, null, new Camera.PictureCallback() {
             @Override
             public void onPictureTaken(byte[] data, Camera camera) {
                 try {
+
                     File photoFile = getOutputMediaFile(1);
                     FileOutputStream fos = new FileOutputStream(photoFile);
                     fos.write(data);
@@ -97,18 +116,29 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    public void onClickStartRecord(View view) {
-        if (prepareVideoRecorder()) {
-            mediaRecorder.start();
-        } else {
-            releaseMediaRecorder();
+    public void onClickRecord(View view){
+        if(isRecording){
+            if (mediaRecorder != null) {
+                mediaRecorder.stop();
+                releaseMediaRecorder();
+            }
+            isRecording = false;
+            recordImageView.setImageResource(R.drawable.record);
+            Toast toast = Toast.makeText(this, "II", Toast.LENGTH_SHORT);
+            toast.setGravity(Gravity.CENTER, 0, 0);
+            toast.show();
         }
-    }
-
-    public void onClickStopRecord(View view) {
-        if (mediaRecorder != null) {
-            mediaRecorder.stop();
-            releaseMediaRecorder();
+        else{
+            if (prepareVideoRecorder()) {
+                mediaRecorder.start();
+                isRecording = true;
+                recordImageView.setImageResource(R.drawable.pause);
+                Toast toast = Toast.makeText(this, "RECORDING", Toast.LENGTH_SHORT);
+                toast.setGravity(Gravity.CENTER, 0, 0);
+                toast.show();
+            } else {
+                releaseMediaRecorder();
+            }
         }
     }
 
