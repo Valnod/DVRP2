@@ -56,7 +56,6 @@ public class MainActivity extends AppCompatActivity {
 
         isRecording = false;
 
-        //setPreviewSize(FULL_SCREEN);
         holder = surfaceView.getHolder();
         holder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
         holder.addCallback(new SurfaceHolder.Callback() {
@@ -73,6 +72,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void surfaceChanged(SurfaceHolder surfaceHolder, int i, int i1, int i2) {
                 camera.stopPreview();
+                setPreviewSize(FULL_SCREEN);
+
                 setCameraDisplayOrientation(CAMERA_ID);
                 try {
                     camera.setPreviewDisplay(holder);
