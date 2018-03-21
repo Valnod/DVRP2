@@ -21,6 +21,7 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -34,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
     SurfaceView surfaceView;
     Camera camera;
     MediaRecorder mediaRecorder;
-    ImageView recordImageView;
+    ImageButton recordImageButton;
     SurfaceHolder holder;
     boolean isRecording;
 
@@ -52,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         surfaceView = findViewById(R.id.surfaceView);
-        recordImageView = findViewById(R.id.imageViewRecord);
+        recordImageButton = findViewById(R.id.imageButtonRecord);
 
         isRecording = false;
 
@@ -114,7 +115,7 @@ public class MainActivity extends AppCompatActivity {
             }
             camera.lock();
             isRecording = false;
-            recordImageView.setImageResource(R.drawable.record);
+            recordImageButton.setImageResource(R.drawable.record);
             Toast toast = Toast.makeText(this, "II", Toast.LENGTH_SHORT);
             toast.setGravity(Gravity.CENTER, 0, 0);
             toast.show();
@@ -143,7 +144,7 @@ public class MainActivity extends AppCompatActivity {
                 releaseMediaRecorder();
             }
             isRecording = false;
-            recordImageView.setImageResource(R.drawable.record);
+            recordImageButton.setImageResource(R.drawable.record);
             Toast toast = Toast.makeText(this, "II", Toast.LENGTH_SHORT);
             toast.setGravity(Gravity.CENTER, 0, 0);
             toast.show();
@@ -152,7 +153,7 @@ public class MainActivity extends AppCompatActivity {
             if (prepareVideoRecorder()) {
                 mediaRecorder.start();
                 isRecording = true;
-                recordImageView.setImageResource(R.drawable.pause);
+                recordImageButton.setImageResource(R.drawable.pause);
                 Toast toast = Toast.makeText(this, "RECORDING", Toast.LENGTH_SHORT);
                 toast.setGravity(Gravity.CENTER, 0, 0);
                 toast.show();
