@@ -15,8 +15,8 @@
         app:showAsAction="always" />
 
     <item
-        android:id="@+id/item1"
-        android:title="Item1" />
+        android:id="@+id/about"
+        android:title="ABOUT" />
     <item
         android:id="@+id/exit"
         android:title="EXIT" />
