@@ -1,6 +1,7 @@
 package com.example.alex.spp;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Matrix;
 import android.graphics.RectF;
@@ -140,10 +141,17 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item)
     {
+        Intent intent;
+
         switch (item.getItemId())
         {
             case R.id.gallery:
-
+                intent = new Intent(this, GalleryActivity.class);
+                startActivity(intent);
+                return true;
+            case R.id.settings:
+                intent = new Intent(this, SettingsActivity.class);
+                startActivity(intent);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -186,7 +194,7 @@ public class MainActivity extends AppCompatActivity {
             camera.lock();
             isRecording = false;
             recordImageButton.setImageResource(R.drawable.record);
-            Toast toast = Toast.makeText(this, "II", Toast.LENGTH_SHORT);
+            Toast toast = Toast.makeText(this, "PAUSED", Toast.LENGTH_SHORT);
             toast.setGravity(Gravity.CENTER, 0, 0);
             toast.show();
         }
@@ -217,7 +225,7 @@ public class MainActivity extends AppCompatActivity {
             stopWatchText.setVisibility(View.INVISIBLE);
             isRecording = false;
             recordImageButton.setImageResource(R.drawable.record);
-            Toast toast = Toast.makeText(this, "II", Toast.LENGTH_SHORT);
+            Toast toast = Toast.makeText(this, "PAUSED", Toast.LENGTH_SHORT);
             toast.setGravity(Gravity.CENTER, 0, 0);
             toast.show();
         }
@@ -292,28 +300,28 @@ public class MainActivity extends AppCompatActivity {
         // To be safe, you should check that the SDCard is mounted
         // using Environment.getExternalStorageState() before doing this.
 
-        File mediaStorageDir = new File(Environment.getExternalStorageDirectory(), "DVROne");
-        //File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "DVROne");
-        //File mediaStorageDir = new File(Environment.getExternalStorageDirectory(), "/sdcard/DRVOne");
 
-        // This location works best if you want the created images to be shared
-        // between applications and persist after your app has been uninstalled.
-
-        // Create the storage directory if it does not exist
-        if (! mediaStorageDir.exists()){
-            if (! mediaStorageDir.mkdirs()){
-                Log.d("DVROne", "failed to create directory");
-                return null;
-            }
-        }
-
-        // Create a media file name
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         File mediaFile;
 
         if (type == MEDIA_TYPE_IMAGE){
+            File mediaStorageDir = new File(Environment.getExternalStorageDirectory(), "DVROne/Photo");
+            if (! mediaStorageDir.exists()){
+                if (! mediaStorageDir.mkdirs()){
+                    Log.d("DVROne", "failed to create directory");
+                    return null;
+                }
+            }
+            String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
             mediaFile = new File(mediaStorageDir.getPath() + File.separator + "IMG_"+ timeStamp + ".jpg");
         } else if(type == MEDIA_TYPE_VIDEO) {
+            File mediaStorageDir = new File(Environment.getExternalStorageDirectory(), "DVROne/Video");
+            if (! mediaStorageDir.exists()){
+                if (! mediaStorageDir.mkdirs()){
+                    Log.d("DVROne", "failed to create directory");
+                    return null;
+                }
+            }
+            String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
             mediaFile = new File(mediaStorageDir.getPath() + File.separator + "VID_"+ timeStamp + ".mp4");
         } else {
             return null;

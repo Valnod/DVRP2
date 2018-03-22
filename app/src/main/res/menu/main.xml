@@ -5,19 +5,19 @@
     <item
         android:id="@+id/gallery"
         android:icon="@android:drawable/ic_menu_gallery"
-        android:title="gallary"
+        android:title="gallery"
         app:showAsAction="always" />
 
     <item
-        android:id="@+id/options"
+        android:id="@+id/settings"
         android:icon="@android:drawable/ic_menu_preferences"
-        android:title="options"
+        android:title="settings"
         app:showAsAction="always" />
 
     <item
         android:id="@+id/item1"
         android:title="Item1" />
     <item
-        android:id="@+id/item2"
-        android:title="Item2" />
+        android:id="@+id/exit"
+        android:title="EXIT" />
 </menu>
