@@ -24,7 +24,7 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageButton;
-import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
@@ -34,13 +34,16 @@ import java.util.Date;
 
 public class MainActivity extends AppCompatActivity {
 
-    SurfaceView surfaceView;
-    Camera camera;
-    MediaRecorder mediaRecorder;
-    ImageButton recordImageButton;
-    SurfaceHolder holder;
-    boolean isRecording;
-
+    private SurfaceView surfaceView;
+    private Camera camera;
+    private MediaRecorder mediaRecorder;
+    private ImageButton recordImageButton;
+    private SurfaceHolder holder;
+    private boolean isRecording;
+    private Thread timeThread;
+    private TextView stopWatchText;
+    private int degrees;
+    private StopWatch sw;
     final int CAMERA_ID = 0;
     final boolean FULL_SCREEN = true;
     public static final int MEDIA_TYPE_IMAGE = 1;
@@ -56,9 +59,10 @@ public class MainActivity extends AppCompatActivity {
 
         surfaceView = findViewById(R.id.surfaceView);
         recordImageButton = findViewById(R.id.imageButtonRecord);
-
+        stopWatchText = findViewById(R.id.textViewStopWatch);
+        sw = new StopWatch();
         isRecording = false;
-
+        degrees = 0;
         holder = surfaceView.getHolder();
         holder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
         holder.addCallback(new SurfaceHolder.Callback() {
@@ -91,6 +95,38 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+
+       timeThread = new Thread(){
+           @Override
+           public void run(){
+               try{
+                   while(true){
+                       Thread.sleep(1000);
+                       runOnUiThread(new Runnable() {
+                           @Override
+                           public void run() {
+                               long date = System.currentTimeMillis();
+                               SimpleDateFormat sdf;
+                               if(degrees == 0 || degrees == 180){
+                                   sdf = new SimpleDateFormat("HH:mm:ss");
+                               }
+                               else{
+                                   sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                               }
+                               String dateString = sdf.format(date);
+                               getSupportActionBar().setTitle(dateString);
+                               if(isRecording){
+                                   stopWatchText.setText("REC: " + sw.toString());
+                               }
+                           }
+                       });
+                   }
+               }
+               catch(InterruptedException e){
+               }
+           }
+       };
+       timeThread.start();
     }
 
     @Override
@@ -106,7 +142,7 @@ public class MainActivity extends AppCompatActivity {
     {
         switch (item.getItemId())
         {
-            case R.id.item1:
+            case R.id.gallery:
 
                 return true;
             default:
@@ -128,6 +164,15 @@ public class MainActivity extends AppCompatActivity {
         if (camera != null)
             camera.release();
         camera = null;
+        isRecording = false;
+        sw.stop();
+        stopWatchText.setVisibility(View.INVISIBLE);
+    }
+
+    @Override
+    protected  void onDestroy(){
+        super.onDestroy();
+        timeThread.interrupt();
     }
 
     public void onClickPicture(View view) {
@@ -136,6 +181,8 @@ public class MainActivity extends AppCompatActivity {
                 mediaRecorder.stop();
                 releaseMediaRecorder();
             }
+            sw.stop();
+            stopWatchText.setVisibility(View.INVISIBLE);
             camera.lock();
             isRecording = false;
             recordImageButton.setImageResource(R.drawable.record);
@@ -166,6 +213,8 @@ public class MainActivity extends AppCompatActivity {
                 mediaRecorder.stop();
                 releaseMediaRecorder();
             }
+            sw.stop();
+            stopWatchText.setVisibility(View.INVISIBLE);
             isRecording = false;
             recordImageButton.setImageResource(R.drawable.record);
             Toast toast = Toast.makeText(this, "II", Toast.LENGTH_SHORT);
@@ -176,6 +225,8 @@ public class MainActivity extends AppCompatActivity {
             if (prepareVideoRecorder()) {
                 mediaRecorder.start();
                 isRecording = true;
+                sw.start();
+                stopWatchText.setVisibility(View.VISIBLE);
                 recordImageButton.setImageResource(R.drawable.pause);
                 Toast toast = Toast.makeText(this, "RECORDING", Toast.LENGTH_SHORT);
                 toast.setGravity(Gravity.CENTER, 0, 0);
@@ -322,7 +373,7 @@ public class MainActivity extends AppCompatActivity {
     void setCameraDisplayOrientation(int cameraId) {
         // определяем насколько повернут экран от нормального положения
         int rotation = getWindowManager().getDefaultDisplay().getRotation();
-        int degrees = 0;
+        degrees = 0;
         switch (rotation) {
             case Surface.ROTATION_0:
                 degrees = 0;

@@ -49,4 +49,24 @@
             app:srcCompat="@drawable/camera1" />
     </LinearLayout>
 
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <TextView
+            android:id="@+id/textViewStopWatch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="20dp"
+            android:background="#50000000"
+            android:text="00:00:00"
+            android:textColor="#f94a2f"
+            android:textSize="28sp"
+            android:textStyle="bold"
+        android:visibility="invisible" />
+    </LinearLayout>
+
 </android.support.constraint.ConstraintLayout>
