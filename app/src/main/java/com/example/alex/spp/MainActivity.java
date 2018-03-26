@@ -2,6 +2,7 @@ package com.example.alex.spp;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Matrix;
 import android.graphics.RectF;
@@ -11,6 +12,7 @@ import android.media.MediaRecorder;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Environment;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -45,10 +47,12 @@ public class MainActivity extends AppCompatActivity {
     private TextView stopWatchText;
     private int degrees;
     private StopWatch sw;
-    final int CAMERA_ID = 0;
-    final boolean FULL_SCREEN = true;
+    private int CAMERA_ID = 1;
+    private boolean FULL_SCREEN = true;
     public static final int MEDIA_TYPE_IMAGE = 1;
     public static final int MEDIA_TYPE_VIDEO = 2;
+    private SharedPreferences sp;
+    private int recordTimer;
 
 
     @Override
@@ -62,6 +66,7 @@ public class MainActivity extends AppCompatActivity {
         surfaceView = findViewById(R.id.surfaceView);
         recordImageButton = findViewById(R.id.imageButtonRecord);
         stopWatchText = findViewById(R.id.textViewStopWatch);
+        sp = PreferenceManager.getDefaultSharedPreferences(this);
         sw = new StopWatch();
         isRecording = false;
         degrees = 0;
@@ -147,11 +152,11 @@ public class MainActivity extends AppCompatActivity {
         switch (item.getItemId())
         {
             case R.id.gallery:
-                intent = new Intent(this, GalleryActivity.class);
+                intent = new Intent(this, SettingsActivity.class);
                 startActivity(intent);
                 return true;
             case R.id.settings:
-                intent = new Intent(this, SettingsActivity.class);
+                intent = new Intent(this, PrefActivity.class);
                 startActivity(intent);
                 return true;
             case R.id.exit:
@@ -166,7 +171,19 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        camera = Camera.open();
+        checkCameraHardware(this);
+
+        FULL_SCREEN = sp.getBoolean("screenKey", true);
+
+        String camString = sp.getString("cameraKey", null);
+        if(camString != null){
+            if (Camera.getNumberOfCameras() > 1 && Integer.parseInt(camString) == 1) {
+                CAMERA_ID = 1;
+            }else{
+                CAMERA_ID = 0;
+            }
+        }
+        camera = Camera.open(CAMERA_ID);
         camera.startPreview();
     }
 
@@ -291,6 +308,8 @@ public class MainActivity extends AppCompatActivity {
             return true;
         } else {
             // no camera on this device
+            finish();
+            System.exit(0);
             return false;
         }
     }
@@ -341,50 +360,48 @@ public class MainActivity extends AppCompatActivity {
 
     void setPreviewSize(boolean fullScreen) {
 
-        // получаем размеры экрана
+        // get screen size
         Display display = getWindowManager().getDefaultDisplay();
         boolean widthIsMax = display.getWidth() > display.getHeight();
 
-        // определяем размеры превью камеры
+        // get camera preview size
         Camera.Size size = camera.getParameters().getPreviewSize();
 
         RectF rectDisplay = new RectF();
         RectF rectPreview = new RectF();
 
-        // RectF экрана, соотвествует размерам экрана
+        // screen's RectF
         rectDisplay.set(0, 0, display.getWidth(), display.getHeight());
 
-        // RectF первью
+        // preview's RectF
         if (widthIsMax) {
-            // превью в горизонтальной ориентации
+            // horizontal preview
             rectPreview.set(0, 0, size.width, size.height);
         } else {
-            // превью в вертикальной ориентации
+            // vertical preview
             rectPreview.set(0, 0, size.height, size.width);
         }
 
         Matrix matrix = new Matrix();
-        // подготовка матрицы преобразования
+        // make ready matrix to convert
         if (!fullScreen) {
-            // если превью будет "втиснут" в экран (второй вариант из урока)
             matrix.setRectToRect(rectPreview, rectDisplay,
                     Matrix.ScaleToFit.START);
         } else {
-            // если экран будет "втиснут" в превью (третий вариант из урока)
             matrix.setRectToRect(rectDisplay, rectPreview,
                     Matrix.ScaleToFit.START);
             matrix.invert(matrix);
         }
-        // преобразование
+        // convert
         matrix.mapRect(rectPreview);
 
-        // установка размеров surface из получившегося преобразования
+        // set surface size
         surfaceView.getLayoutParams().height = (int) (rectPreview.bottom);
         surfaceView.getLayoutParams().width = (int) (rectPreview.right);
     }
 
     void setCameraDisplayOrientation(int cameraId) {
-        // определяем насколько повернут экран от нормального положения
+        //check screen rotation
         int rotation = getWindowManager().getDefaultDisplay().getRotation();
         degrees = 0;
         switch (rotation) {
@@ -408,11 +425,11 @@ public class MainActivity extends AppCompatActivity {
         Camera.CameraInfo info = new Camera.CameraInfo();
         Camera.getCameraInfo(cameraId, info);
 
-        // задняя камера
+        // back camera
         if (info.facing == Camera.CameraInfo.CAMERA_FACING_BACK) {
             result = ((360 - degrees) + info.orientation);
         } else
-            // передняя камера
+            // front camera
             if (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
                 result = ((360 - degrees) - info.orientation);
                 result += 360;

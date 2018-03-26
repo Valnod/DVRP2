@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <PreferenceCategory
+        android:key="general"
+        android:summary="General Settings"
+        android:title="General">
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="screenKey"
+            android:summaryOff="Off"
+            android:summaryOn="On"
+            android:title="Full Screen Mode"/>
+        <ListPreference
+            android:key="cameraKey"
+            android:entries="@array/cameraLabel"
+            android:entryValues="@array/cameraValue"
+            android:defaultValue="@string/backCameraValue"
+            android:summary="%s"
+            android:title="Camera"/>
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="powerKey"
+            android:summaryOff="Off"
+            android:summaryOn="On"
+            android:title="Pause when charger is disconnected" />
+    </PreferenceCategory>
+    <PreferenceCategory
+        android:key="video"
+        android:summary="Video Settings"
+        android:title="Video Recording Settings">
+
+        <ListPreference
+            android:key="videoQuality"
+            android:entries="@array/videoQualityLabel"
+            android:entryValues="@array/videoQualityValue"
+            android:defaultValue="HD 720"
+            android:summary="%s"
+            android:title="Video Recording Quality"/>
+        <EditTextPreference
+            android:defaultValue="10"
+            android:key="length"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:inputType="numberDecimal"
+            android:digits="0123456789"
+            android:summary="Not Selected"
+            android:title="Recording Length Per File (minutes)" />
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:key="photo"
+        android:summary="Photo Settings"
+        android:title="Photo Capture Settings">
+        <ListPreference
+            android:key="photoSizeKey"
+            android:entries="@array/photoSizeLabel"
+            android:entryValues="@array/photoSizeValue"
+            android:defaultValue="8M"
+            android:summary="%s"
+            android:title="Picture Size"/>
+    </PreferenceCategory>
+</PreferenceScreen>

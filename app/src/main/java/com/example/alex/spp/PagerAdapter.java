@@ -19,13 +19,13 @@ public class PagerAdapter extends FragmentStatePagerAdapter {
     @Override
     public Fragment getItem(int position) {
         switch (position) {
+            //case 0:
+                //FragmentGeneralSettings generalSettings = new FragmentGeneralSettings();
+                //return generalSettings;
             case 0:
-                FragmentGeneralSettings generalSettings = new FragmentGeneralSettings();
-                return generalSettings;
-            case 1:
                 FragmentPhotoSettings photoSettings = new FragmentPhotoSettings();
                 return photoSettings;
-            case 2:
+            case 1:
                 FragmentVideoSettings videoSettings = new FragmentVideoSettings();
                 return videoSettings;
             default:
