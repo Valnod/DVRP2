@@ -27,6 +27,13 @@
             android:summaryOff="Off"
             android:summaryOn="On"
             android:title="Pause when charger is disconnected" />
+        <ListPreference
+            android:key="storageKey"
+            android:entries="@array/storageLabel"
+            android:entryValues="@array/storageValue"
+            android:defaultValue="external"
+            android:summary="%s"
+            android:title="Storage"/>
     </PreferenceCategory>
     <PreferenceCategory
         android:key="video"

@@ -10,6 +10,15 @@
         <item>@string/backCameraValue</item>
     </string-array>
 
+    <string-array name="storageLabel">
+        <item>"Gallery"</item>
+        <item>"External"</item>
+    </string-array>
+    <string-array name="storageValue">
+        <item>"gallery"</item>
+        <item>"external"</item>
+    </string-array>
+
     <string-array name="photoSizeLabel">
         <item>"13M pixels"</item>
         <item>"8M pixels"</item>

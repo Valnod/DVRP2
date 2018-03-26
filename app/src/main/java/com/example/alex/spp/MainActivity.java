@@ -53,6 +53,7 @@ public class MainActivity extends AppCompatActivity {
     public static final int MEDIA_TYPE_VIDEO = 2;
     private SharedPreferences sp;
     private int recordTimer;
+    private boolean isExternalStorage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -122,6 +123,7 @@ public class MainActivity extends AppCompatActivity {
                                String dateString = sdf.format(date);
                                getSupportActionBar().setTitle(dateString);
                                if(isRecording){
+                                   recordTimer++;
                                    stopWatchText.setText("REC: " + sw.toString());
                                }
                            }
@@ -174,6 +176,9 @@ public class MainActivity extends AppCompatActivity {
 
         FULL_SCREEN = sp.getBoolean("screenKey", true);
 
+        String storage = sp.getString("storageKey", null);
+        isExternalStorage = storage.equals("gallery") ? false : true;
+
         String camString = sp.getString("cameraKey", null);
         if(camString != null){
             if (Camera.getNumberOfCameras() > 1 && Integer.parseInt(camString) == 1) {
@@ -219,12 +224,14 @@ public class MainActivity extends AppCompatActivity {
             toast.setGravity(Gravity.CENTER, 0, 0);
             toast.show();
         }
+        final File photoFile = getOutputMediaFile(1);
+        Toast toast = Toast.makeText(this, photoFile.toString(), Toast.LENGTH_SHORT);
+        toast.setGravity(Gravity.CENTER, 0, 0);
+        toast.show();
         camera.takePicture(null, null, new Camera.PictureCallback() {
             @Override
             public void onPictureTaken(byte[] data, Camera camera) {
                 try {
-
-                    File photoFile = getOutputMediaFile(1);
                     FileOutputStream fos = new FileOutputStream(photoFile);
                     fos.write(data);
                     fos.close();
@@ -257,9 +264,6 @@ public class MainActivity extends AppCompatActivity {
                 sw.start();
                 stopWatchText.setVisibility(View.VISIBLE);
                 recordImageButton.setImageResource(R.drawable.pause);
-                Toast toast = Toast.makeText(this, "RECORDING", Toast.LENGTH_SHORT);
-                toast.setGravity(Gravity.CENTER, 0, 0);
-                toast.show();
             } else {
                 releaseMediaRecorder();
             }
@@ -269,7 +273,9 @@ public class MainActivity extends AppCompatActivity {
     private boolean prepareVideoRecorder() {
 
         File videoFile = getOutputMediaFile(2);
-
+        Toast toast = Toast.makeText(this, videoFile.toString(), Toast.LENGTH_SHORT);
+        toast.setGravity(Gravity.CENTER, 0, 0);
+        toast.show();
         camera.unlock();
 
         mediaRecorder = new MediaRecorder();
@@ -327,25 +333,37 @@ public class MainActivity extends AppCompatActivity {
         File mediaFile;
 
         if (type == MEDIA_TYPE_IMAGE){
-            File mediaStorageDir = new File(Environment.getExternalStorageDirectory(), "DVROne/Photo");
-            if (! mediaStorageDir.exists()){
-                if (! mediaStorageDir.mkdirs()){
-                    Log.d("DVROne", "failed to create directory");
-                    return null;
+            if(isExternalStorage){
+                File mediaStorageDir = new File(Environment.getExternalStorageDirectory(), "DVROne/Photo");
+                if (! mediaStorageDir.exists()){
+                    if (! mediaStorageDir.mkdirs()){
+                        Log.d("DVROne", "failed to create directory");
+                        return null;
+                    }
                 }
+                String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+                mediaFile = new File(mediaStorageDir.getPath() + File.separator + "IMG_"+ timeStamp + ".jpg");
             }
-            String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-            mediaFile = new File(mediaStorageDir.getPath() + File.separator + "IMG_"+ timeStamp + ".jpg");
+            else{
+                String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+                mediaFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) + File.separator + "IMG_"+ timeStamp + ".jpg");
+            }
         } else if(type == MEDIA_TYPE_VIDEO) {
-            File mediaStorageDir = new File(Environment.getExternalStorageDirectory(), "DVROne/Video");
-            if (! mediaStorageDir.exists()){
-                if (! mediaStorageDir.mkdirs()){
-                    Log.d("DVROne", "failed to create directory");
-                    return null;
+            if(isExternalStorage){
+                File mediaStorageDir = new File(Environment.getExternalStorageDirectory(), "DVROne/Video");
+                if (! mediaStorageDir.exists()){
+                    if (! mediaStorageDir.mkdirs()){
+                        Log.d("DVROne", "failed to create directory");
+                        return null;
+                    }
                 }
+                String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+                mediaFile = new File(mediaStorageDir.getPath() + File.separator + "VID_"+ timeStamp + ".mp4");
             }
-            String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-            mediaFile = new File(mediaStorageDir.getPath() + File.separator + "VID_"+ timeStamp + ".mp4");
+            else{
+                String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+                mediaFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES) + File.separator + "VID_"+ timeStamp + ".mp4");
+            }
         } else {
             return null;
         }
