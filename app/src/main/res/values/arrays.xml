@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="cameraLabel">
+        <item>@string/frontCameraLabel</item>
+        <item>@string/backCameraLabel</item>
+    </string-array>
+    <string-array name="cameraValue">
+        <item>@string/frontCameraValue</item>
+        <item>@string/backCameraValue</item>
+    </string-array>
+
+    <string-array name="photoSizeLabel">
+        <item>"13M pixels"</item>
+        <item>"8M pixels"</item>
+        <item>"5M pixels"</item>
+        <item>"3M pixels"</item>
+        <item>"2M pixels"</item>
+        <item>"1.3M pixels"</item>
+        <item>"1M pixels"</item>
+        <item>"720x480"</item>
+        <item>"VGA"</item>
+        <item>"QVGA"</item>
+    </string-array>
+    <string-array name="photoSizeValue">
+        <item>"13M"</item>
+        <item>"8M"</item>
+        <item>"5M"</item>
+        <item>"3M"</item>
+        <item>"2M"</item>
+        <item>"1.3M"</item>
+        <item>"1M"</item>
+        <item>"720"</item>
+        <item>"VGA"</item>
+        <item>"QVGA"</item>
+    </string-array>
+
+    <string-array name="videoQualityLabel">
+        <item>"High Quality (HQ)"</item>
+        <item>"Low Quality (LQ)"</item>
+        <item>"HD 1080p (1920x108)"</item>
+        <item>"HD 720p (1280x720)"</item>
+        <item>"ED 480p (720x480)"</item>
+        <item>"QSIF 144p (176x144)"</item>
+    </string-array>
+    <string-array name="videoQualityValue">
+        <item>"High"</item>
+        <item>"Low"</item>
+        <item>"HD1080"</item>
+        <item>"HD720"</item>
+        <item>"ED480"</item>
+        <item>"QSIF"</item>
+    </string-array>
+</resources>

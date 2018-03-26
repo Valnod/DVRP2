@@ -20,13 +20,14 @@ public class SettingsActivity extends AppCompatActivity implements FragmentGener
         setSupportActionBar(toolbar);
 
         TabLayout tabLayout = findViewById(R.id.tab_layout);
-        tabLayout.addTab(tabLayout.newTab().setText("GENERAL"));
+        //tabLayout.addTab(tabLayout.newTab().setText("GENERAL"));
         tabLayout.addTab(tabLayout.newTab().setText("PHOTO"));
         tabLayout.addTab(tabLayout.newTab().setText("VIDEO"));
         tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
 
         final ViewPager viewPager = findViewById(R.id.pager);
         final PagerAdapter adapter = new PagerAdapter(getSupportFragmentManager(), tabLayout.getTabCount());
+
         viewPager.setAdapter(adapter);
         viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
