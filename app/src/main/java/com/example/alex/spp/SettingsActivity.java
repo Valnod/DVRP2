@@ -1,5 +1,6 @@
 package com.example.alex.spp;
 
+import android.app.Activity;
 import android.net.Uri;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
@@ -11,6 +12,7 @@ import android.view.MenuItem;
 
 public class SettingsActivity extends AppCompatActivity implements FragmentGeneralSettings.OnFragmentInteractionListener,
         FragmentVideoSettings.OnFragmentInteractionListener, FragmentPhotoSettings.OnFragmentInteractionListener{
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

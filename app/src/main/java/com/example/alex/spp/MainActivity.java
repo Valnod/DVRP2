@@ -55,6 +55,7 @@ public class MainActivity extends AppCompatActivity {
     private int recordTimer;
     private boolean isExternalStorage;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
