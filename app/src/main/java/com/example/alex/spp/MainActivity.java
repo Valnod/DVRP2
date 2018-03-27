@@ -2,6 +2,7 @@ package com.example.alex.spp;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Matrix;
@@ -11,6 +12,7 @@ import android.media.CamcorderProfile;
 import android.media.MediaRecorder;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
+import android.os.BatteryManager;
 import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
@@ -53,8 +55,10 @@ public class MainActivity extends AppCompatActivity {
     public static final int MEDIA_TYPE_VIDEO = 2;
     private SharedPreferences sp;
     private int recordTimer;
+    private int videoLengthSeconds;
+    private boolean useChargerConnection;
     private boolean isExternalStorage;
-
+    private int camProfile;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -124,8 +128,16 @@ public class MainActivity extends AppCompatActivity {
                                String dateString = sdf.format(date);
                                getSupportActionBar().setTitle(dateString);
                                if(isRecording){
-                                   recordTimer++;
+                                   if(videoLengthSeconds > 0){
+                                       recordTimer++;
+                                       if(recordTimer >= videoLengthSeconds){
+                                           recordImageButton.performClick();
+                                           recordImageButton.performClick();
+                                           recordTimer = 0;
+                                       }
+                                   }
                                    stopWatchText.setText("REC: " + sw.toString());
+                                   CheckChargerConnetction();
                                }
                            }
                        });
@@ -136,6 +148,17 @@ public class MainActivity extends AppCompatActivity {
            }
        };
        timeThread.start();
+    }
+
+    public void CheckChargerConnetction(){
+        if(useChargerConnection){
+            if(!isChargerConnected(this)){
+                Toast toast = Toast.makeText(this, "Charger is disconnected", Toast.LENGTH_SHORT);
+                toast.setGravity(Gravity.CENTER, 0, 0);
+                toast.show();
+                recordImageButton.performClick();
+            }
+        }
     }
 
     @Override
@@ -174,12 +197,16 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         checkCameraHardware(this);
-
+        recordTimer = 0;
         FULL_SCREEN = sp.getBoolean("screenKey", true);
+        useChargerConnection = sp.getBoolean("powerKey", true);
+        String videoQuality = sp.getString( "videoQuality", "High");
+        setCamcorderProfile(videoQuality);
 
         String storage = sp.getString("storageKey", null);
         isExternalStorage = storage.equals("gallery") ? false : true;
 
+        videoLengthSeconds = 60 * Integer.parseInt(sp.getString("length", "0"));
         String camString = sp.getString("cameraKey", null);
         if(camString != null){
             if (Camera.getNumberOfCameras() > 1 && Integer.parseInt(camString) == 1) {
@@ -192,6 +219,24 @@ public class MainActivity extends AppCompatActivity {
         camera.startPreview();
     }
 
+    public void setCamcorderProfile(String videoQuality){
+        switch (videoQuality){
+            case "Low":
+                camProfile = CamcorderProfile.QUALITY_LOW;
+                break;
+            case "HD1080":
+                camProfile = CamcorderProfile.QUALITY_1080P;
+                break;
+            case "HD720":
+                camProfile = CamcorderProfile.QUALITY_720P;
+                break;
+            case "ED480":
+                camProfile = CamcorderProfile.QUALITY_480P;
+                break;
+                default: camProfile = CamcorderProfile.QUALITY_HIGH;
+        }
+    }
+
     @Override
     protected void onPause() {
         super.onPause();
@@ -200,8 +245,10 @@ public class MainActivity extends AppCompatActivity {
             camera.release();
         camera = null;
         isRecording = false;
+        recordTimer = 0;
         sw.stop();
         stopWatchText.setVisibility(View.INVISIBLE);
+        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     }
 
     @Override
@@ -212,18 +259,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void onClickPicture(View view) {
         if(isRecording){
-            if (mediaRecorder != null) {
-                mediaRecorder.stop();
-                releaseMediaRecorder();
-            }
-            sw.stop();
-            stopWatchText.setVisibility(View.INVISIBLE);
-            camera.lock();
-            isRecording = false;
-            recordImageButton.setImageResource(R.drawable.record);
-            Toast toast = Toast.makeText(this, "PAUSED", Toast.LENGTH_SHORT);
-            toast.setGravity(Gravity.CENTER, 0, 0);
-            toast.show();
+            recordImageButton.performClick();
         }
         final File photoFile = getOutputMediaFile(1);
         Toast toast = Toast.makeText(this, photoFile.toString(), Toast.LENGTH_SHORT);
@@ -251,20 +287,31 @@ public class MainActivity extends AppCompatActivity {
                 releaseMediaRecorder();
             }
             sw.stop();
+            recordTimer = 0;
             stopWatchText.setVisibility(View.INVISIBLE);
             isRecording = false;
             recordImageButton.setImageResource(R.drawable.record);
             Toast toast = Toast.makeText(this, "PAUSED", Toast.LENGTH_SHORT);
             toast.setGravity(Gravity.CENTER, 0, 0);
             toast.show();
+            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         }
         else{
+            if(useChargerConnection){
+                if(!isChargerConnected(this)){
+                    Toast toast = Toast.makeText(this, "Charger is disconnected", Toast.LENGTH_SHORT);
+                    toast.setGravity(Gravity.CENTER, 0, 0);
+                    toast.show();
+                    return;
+                }
+            }
             if (prepareVideoRecorder()) {
                 mediaRecorder.start();
                 isRecording = true;
                 sw.start();
                 stopWatchText.setVisibility(View.VISIBLE);
                 recordImageButton.setImageResource(R.drawable.pause);
+                getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
             } else {
                 releaseMediaRecorder();
             }
@@ -284,7 +331,8 @@ public class MainActivity extends AppCompatActivity {
         mediaRecorder.setCamera(camera);
         mediaRecorder.setAudioSource(MediaRecorder.AudioSource.CAMCORDER);
         mediaRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
-        mediaRecorder.setProfile(CamcorderProfile.get(CamcorderProfile.QUALITY_HIGH));
+        mediaRecorder.setProfile(CamcorderProfile.get(camProfile));
+
         mediaRecorder.setOutputFile(videoFile.getAbsolutePath());
         mediaRecorder.setPreviewDisplay(surfaceView.getHolder().getSurface());
 
@@ -329,7 +377,6 @@ public class MainActivity extends AppCompatActivity {
     private File getOutputMediaFile(int type){
         // To be safe, you should check that the SDCard is mounted
         // using Environment.getExternalStorageState() before doing this.
-
 
         File mediaFile;
 
@@ -436,10 +483,9 @@ public class MainActivity extends AppCompatActivity {
                 degrees = 270;
                 break;
         }
-
         int result = 0;
 
-        // получаем инфо по камере cameraId
+        // get camera info
         Camera.CameraInfo info = new Camera.CameraInfo();
         Camera.getCameraInfo(cameraId, info);
 
@@ -454,5 +500,11 @@ public class MainActivity extends AppCompatActivity {
             }
         result = result % 360;
         camera.setDisplayOrientation(result);
+    }
+
+    public boolean isChargerConnected(Context context) {
+        Intent intent = context.registerReceiver(null, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
+        int plugged = intent.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1);
+        return plugged == BatteryManager.BATTERY_PLUGGED_AC || plugged == BatteryManager.BATTERY_PLUGGED_USB;
     }
 }

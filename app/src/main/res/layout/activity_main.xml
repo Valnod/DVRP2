@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@android:color/black"
     tools:context="com.example.alex.spp.MainActivity"
     tools:layout_editor_absoluteY="81dp">
 
@@ -65,7 +66,7 @@
             android:text="00:00:00"
             android:textColor="#f94a2f"
             android:textSize="28sp"
-        android:visibility="invisible" />
+            android:visibility="invisible" />
     </LinearLayout>
 
 </android.support.constraint.ConstraintLayout>
